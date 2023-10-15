@@ -1,23 +1,69 @@
-const express = require('express');
+// "mongodb://127.0.0.1:27017";
+const mongoose = require("mongoose");
+const budgetModel = require("./Datamodule/budget");
+
+const bodyParser = require("body-parser");
+const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = 3000;
-const fileSystem = require('fs')
-const importJSON = fileSystem.readFileSync('budget.json', 'utf8');
-const budgetData = JSON.parse(importJSON);
 
-app.get('/hello', (req, res) => 
-{
-res.send('Hello World!');
+const corsOptions = {
+  origin: "http://localhost:3000",
+};
+app.use(cors(corsOptions));
+
+app.use(bodyParser.json());
+app.use("/", express.static("public"));
+
+app.get("/items", (req, res) => {
+  mongoose.connect("mongodb://127.0.0.1:27017/dataforbudgetchart", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Database Connected");
+    budgetModel.find({})
+      .then((data) => {
+        res.json(data);
+        console.log(data);
+        mongoose.connection.close();
+      })
+      .catch((connectionError) => {
+        console.error(connectionError);
+      });
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 });
 
-app.listen(port, () =>
-{
-console.log(`Example app listening at http://localhost:${port}`);
-}
-);
+app.post("/items", (req, res) => {
+    mongoose.connect("mongodb://127.0.0.1:27017/dataforbudgetchart", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => {
+      console.log("Connected to the database");
+      const newItem = new budgetModel(req.body);
+      budgetModel.create(newItem) 
+        .then((data) => {
+          res.json(data);
+          console.log(data);
+          mongoose.connection.close();
+        })
+        .catch((connectionError) => {
+          console.error(connectionError);
+          res.status(400).json({ error: 'Internal Server error-Validation failed' });
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).json({ error: 'Internal Server error' });
+    });
+  });
+  
 
-app.get('/budget', (req, res) => {
-    res.json(budgetData);
+app.listen(port, () => {
+  console.log(`API served at http://localhost:${port}`);
 });
-
-app.use('/',express.static('public'));
