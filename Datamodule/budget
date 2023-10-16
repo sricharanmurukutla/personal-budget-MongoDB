@@ -9,7 +9,7 @@ const budgetSchema = new mongoose.Schema({
           validator: function (value) {
             return /^#[0-9A-Fa-f]{6}$/.test(value);
           },
-          message: 'The Colors will be in hexadecimal format.',
+          message: 'The Colors will be in hexadecimal format).',
         },
     },
 }, {

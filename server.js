@@ -1,7 +1,5 @@
-// "mongodb://127.0.0.1:27017";
 const mongoose = require("mongoose");
 const budgetModel = require("./Datamodule/budget");
-
 const bodyParser = require("body-parser");
 const express = require("express");
 const cors = require("cors");
@@ -65,5 +63,5 @@ app.post("/items", (req, res) => {
   
 
 app.listen(port, () => {
-  console.log(`API served at http://localhost:${port}`);
+  console.log(`API is running at http://localhost:${port}`);
 });
